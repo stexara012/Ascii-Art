@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASCII Rorschach Generator 🎨 v4.5</title>
+<style>
+  body {
+    background-color: #000;
+    color: #0f0;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    color: #00ffaa;
+    text-shadow: 0 0 15px #00ffaa;
+    margin-bottom: 10px;
+  }
+
+  #ascii {
+    white-space: pre;
+    line-height: 1em;
+    font-size: 12px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #00ffaa33;
+    padding: 10px;
+    background: #111;
+    box-shadow: 0 0 20px #00ffaa22;
+    user-select: none;
+    scale: 0.5;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    gap: 8px;
+    color: #00ffaa;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  input[type="range"], select {
+    width: 200px;
+    accent-color: #00ffaa;
+    background: #111;
+    color: #00ffaa;
+    border: 1px solid #00ffaa;
+  }
+
+  button {
+    background-color: #111;
+    color: #00ffaa;
+    border: 1px solid #00ffaa;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background-color: #00ffaa;
+    color: #111;
+  }
+
+  span.symbol {
+    display: inline;
+  }
+
+  .legend {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px dashed #00ffaa55;
+    background: #0c0c0c;
+    width: fit-content;
+    color: #aaffcc;
+    box-shadow: 0 0 10px #00ffaa22;
+    text-align: center;
+  }
+
+  .legend h3 {
+    margin: 0;
+    color: #00ffaa;
+    text-shadow: 0 0 5px #00ffaa;
+  }
+
+  .legend p {
+    margin-top: 5px;
+    font-size: 13px;
+    opacity: 0.9;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <h1>🪞 ASCII Rorschach Generator 🎨 v4.5</h1>
+
+  <div class="controls">
+    <label>
+      Širina: <span id="widthValue">80</span>
+      <input type="range" id="width" min="40" max="160" value="80">
+    </label>
+    <label>
+      Visina: <span id="heightValue">30</span>
+      <input type="range" id="height" min="10" max="60" value="30">
+    </label>
+    <label>
+      Gustina: <span id="densityValue">0.3</span>
+      <input type="range" id="density" min="0.05" max="0.7" step="0.05" value="0.3">
+    </label>
+
+    <label>
+      🎨 Shema boja:
+      <select id="colorMode">
+        <option value="matrix">🟢 Matrix Green</option>
+        <option value="fire">🔥 Fire</option>
+        <option value="ocean">🌊 Ocean</option>
+        <option value="psychedelic">🌈 Psychedelic</option>
+      </select>
+    </label>
+
+    <label>
+      🪞 Simetrija:
+      <select id="symmetry">
+        <option value="vertical">Vertikalna</option>
+        <option value="horizontal">Horizontalna</option>
+        <option value="diagonal">Dijagonalna</option>
+      </select>
+    </label>
+
+    <button onclick="toggleAnimation()">🌀 Uključi / Isključi animaciju</button>
+    <button onclick="generate()">🎲 Nova mrlja</button>
+  </div>
+
+  <pre id="ascii"></pre>
+
+  <div id="legend" class="legend">
+    <h3>🧩 Mapa percepcije</h3>
+    <p id="legendText">U ovom uzorku neki vide: sove, leptire, lica, duhove...</p>
+  </div>
+
+<script>
+let animationActive = false;
+let animationFrame;
+
+// 🔹 Boje po režimima
+function getColorMap(mode) {
+  const maps = {
+    matrix: ["#000", "#003300", "#004d00", "#00cc00", "#00ff00", "#99ff99", "#ccffcc"],
+    fire: ["#000", "#330000", "#661100", "#cc3300", "#ff6600", "#ffcc00", "#ffff99"],
+    ocean: ["#000033", "#001a66", "#0033cc", "#0066ff", "#33ccff", "#99ffff", "#ccffff"],
+    psychedelic: ["#000", "#ff00ff", "#00ffff", "#ffff00", "#ff6600", "#00ff00", "#ff0000"]
+  };
+  return maps[mode] || maps.matrix;
+}
+
+// 🔹 Moguće simboličke interpretacije (legenda)
+const interpretations = [
+  "🦉 SOVA – mudrost u tami.",
+  "🦋 LEPTIR – transformacija i sloboda.",
+  "👁️ LICE – ogledalo nesvesnog.",
+  "🐍 ZMIJA – instinkt i tajne dubine.",
+  "🔥 PLAMEN – strast i energija.",
+  "🌙 POLUMJESEC – san i intuicija.",
+  "🐉 ZMAJ – snaga i haos.",
+  "🪶 KRILA – oslobađanje.",
+  "💀 LOBANJA – suočavanje sa podsvešću.",
+  "🌸 CVET – unutrašnji mir."
+];
+
+// 🔹 Prikaz nasumične legende
+function updateLegend() {
+  const legendText = document.getElementById("legendText");
+  const suggestionCount = Math.floor(Math.random() * 3) + 2;
+  const shuffled = interpretations.sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, suggestionCount);
+  legendText.innerHTML = "U ovom uzorku neki vide:<br>" + selected.join("<br>");
+}
+
+// 🔹 Glavna funkcija generisanja ASCII paterna
+function generate() {
+  const width = parseInt(document.getElementById("width").value);
+  const height = parseInt(document.getElementById("height").value);
+  const density = parseFloat(document.getElementById("density").value);
+  const colorMode = document.getElementById("colorMode").value;
+  const symmetry = document.getElementById("symmetry").value;
+
+  const asciiContainer = document.getElementById("ascii");
+  asciiContainer.innerHTML = "";
+
+  const chars = [" ", ".", ":", "-", "=", "+", "*", "#", "%", "@"];
+  const colorMap = getColorMap(colorMode);
+
+  let html = "";
+
+  for (let y = 0; y < height; y++) {
+    let row = [];
+    for (let x = 0; x < width; x++) {
+      if (Math.random() < density) {
+        const idx = Math.floor(Math.random() * chars.length);
+        const char = chars[idx];
+        const color = colorMap[Math.floor(idx / chars.length * colorMap.length)];
+        row.push(`<span style="color:${color}">${char}</span>`);
+      } else {
+        row.push(" ");
+      }
+    }
+
+    // 🪞 Simetrija
+    if (symmetry === "vertical") {
+      const half = row.slice(0, width / 2);
+      row = half.concat([...half].reverse());
+    } else if (symmetry === "horizontal") {
+      if (y < height / 2) {
+        html += row.join("") + "<br>";
+      } else {
+        const mirror = html.split("<br>")[height - y - 1];
+        html += mirror + "<br>";
+        continue;
+      }
+    } else if (symmetry === "diagonal") {
+      for (let x = 0; x < width; x++) {
+        if (x === y || width - x === y) {
+          row[x] = `<span style="color:#fff">${chars[Math.floor(Math.random() * chars.length)]}</span>`;
+        }
+      }
+    }
+
+    html += row.join("") + "<br>";
+  }
+
+  asciiContainer.innerHTML = html;
+  updateLegend(); // 🔮 Legenda uzoraka
+
+  document.getElementById("widthValue").textContent = width;
+  document.getElementById("heightValue").textContent = height;
+  document.getElementById("densityValue").textContent = density.toFixed(2);
+}
+
+// 🔹 Animacija
+function animate() {
+  if (!animationActive) return;
+  generate();
+  animationFrame = setTimeout(animate, 300); // brzina pulsiranja
+}
+
+// 🔹 Prekidač za animaciju
+function toggleAnimation() {
+  animationActive = !animationActive;
+  if (animationActive) {
+    animate();
+  } else {
+    clearTimeout(animationFrame);
+  }
+}
+
+// Pokretanje na start
+generate();
+</script>
+</body>
+</html>

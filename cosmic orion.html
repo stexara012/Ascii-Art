@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<title>Kosmički Orion — Galaktički Vrtlog</title>
+
+<style>
+    body {
+        background: #000;
+        margin: 0;
+        overflow: hidden;
+        font-family: monospace;
+        color: #0ff;
+    }
+
+    /* KONTEJNER CELE ANIMIRANE SCENE */
+    .vrtlog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: pre;
+        text-align: center;
+        font-size: 13px;
+        animation: rotate 40s linear infinite;
+        color: #5dfdff;
+    }
+
+    @keyframes rotate {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* TREPERENJE */
+    .twinkle {
+        animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle {
+        from { opacity: 1; }
+        to   { opacity: 0.3; }
+    }
+
+    /* PARALAKSA – POZADINSKE ZVEZDE */
+    .parallax-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;
+        background-repeat: repeat;
+        animation: drift 100s linear infinite;
+        pointer-events: none;
+    }
+
+    .parallax-back {
+        background-image: radial-gradient(white 1px, transparent 1px);
+        background-size: 3px 3px;
+        opacity: 0.1;
+        animation-duration: 160s;
+    }
+
+    .parallax-mid {
+        background-image: radial-gradient(#66eaff 0.5px, transparent 1px);
+        background-size: 1px 1px;
+        opacity: 0.1;
+        animation-duration: 90s;
+    }
+
+    .parallax-front {
+        background-image: radial-gradient(#aaffff 2px, transparent 2px);
+        background-size: 6px 6px;
+        opacity: 0.1;
+        animation-duration: 55s;
+    }
+
+    @keyframes drift {
+        from { transform: translate(0,0); }
+        to   { transform: translate(-200px, -200px); }
+    }
+
+    /* PLANETE – lagano lebdenje gore-dole */
+    .planet {
+        animation: float 6s ease-in-out infinite alternate;
+        display: inline-block;
+    }
+    @keyframes float {
+        from { transform: translateY(-3px); }
+        to   { transform: translateY(3px); }
+    }
+
+    /* KOMETE – preleću ekran */
+    .comet {
+        position: absolute;
+        font-size: 18px;
+        animation: flyby 6s linear infinite;
+    }
+
+    @keyframes flyby {
+        0%   { transform: translate(10vw, 10vh) rotate(20deg); opacity: 0; }
+        10%  { opacity: 1; }
+        100% { transform: translate(-120vw, -120vh) rotate(-20deg); opacity: 0; }
+    }
+
+    .comet2 { animation-duration: 8s; animation-delay: 3s; }
+    .comet3 { animation-duration: 12s; animation-delay: 6s; }
+
+</style>
+</head>
+<body>
+
+<!-- PARALAKSA SLOJEVI -->
+<div class="parallax-layer parallax-back"></div>
+<div class="parallax-layer parallax-mid"></div>
+<div class="parallax-layer parallax-front"></div>
+
+<!-- KOMETE -->
+<div class="comet">☄️</div>
+<div class="comet comet2">☄️</div>
+<div class="comet comet3">☄️</div>
+
+<!-- GLAVNI VRTLOG — sve iz .stars je sada OVDE -->
+<div class="vrtlog">
+
+                                        ☄️
+                           . . .    .      *       .
+                        .        *       .      *
+                                  ***        
+                                *  |  *         .       ✦
+                                  \ | /      .
+                           ✦       \|/        .
+             .                       ✧
+                                   .  \
+                      .    *          *\      .            
+                          .        ***  \          .     
+                               *     |   \   🜁
+                                   *  |    \         <span class="planet">🌍</span>
+                *                    ***     )  .         
+                         .                     )       <span class="planet">🪐</span>
+                                            . (          
+       .         .             ✦               )     
+                            ✦     ORION        )                
+                ✦                    ✦      . (     
+                                      *       )
+                         *                 ***    .          
+                   ✧          *        *    |   
+                                 *           |            ✧
+        ☄️                        .           |         .       
+                             .               ***              
+                                       .               
+                         .       *                     ✦
+                ✧                         .       
+                                               o
+                         <span class="planet">🌑</span>                         O
+
+
+
+
+        
+
+</div>
+
+</body>
+</html>
