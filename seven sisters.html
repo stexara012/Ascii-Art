@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ASCII Plejade – 4 Frame Rotacija</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient(circle at center,
+            #0b0f2e 0%, #06061a 40%, #000000 100%);
+        color: #cde4ff;
+        font-family: "Courier New", monospace;
+        overflow: hidden;
+    }
+
+    /* kosmička pozadina */
+    body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(2px 2px at 10% 20%, #fff3, transparent),
+            radial-gradient(1px 1px at 70% 40%, #fff6, transparent),
+            radial-gradient(1px 1px at 30% 80%, #fff4, transparent),
+            radial-gradient(2px 2px at 90% 60%, #fff5, transparent);
+        animation: starShift 60s linear infinite;
+    }
+
+    @keyframes starShift {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(-300px, -200px) scale(1.3); }
+    }
+
+    #asciiBox {
+        position: relative;
+        z-index: 10;
+        white-space: pre;
+        text-shadow: 0 0 8px #9fcfff, 0 0 14px #4fa3ff;
+        font-size: 17px;
+        transform-style: preserve-3d;
+        animation: tilt 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes tilt {
+        0%   { transform: rotateX(0deg) rotateY(0deg); }
+        100% { transform: rotateX(12deg) rotateY(10deg); }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="asciiBox"></div>
+
+<script>
+/* -----------------------------------------
+   ČETIRI FRAMEOVA ROTACIJE PLANETICA
+------------------------------------------*/
+const frames = [
+
+`                .        ✧   ✨       *  
+    *  .  *       ✧       ✦    🌠          🪐
+      .    .   Maia       .        ✧
+   ✧        *     ✨     .   *   Taygeta     🌑
+  *       🌍      🪐     *    .    ✦   *  ✧
+         ✧   .  .    .     .       .   Alcyone
+      🌒    *   ✦   .   🪐  ✨ 🌕   .    *  .   .
+          *   ✧   🌑  .   ☄️ .     ✧  .    ✨   ✦  
+                  🌎        .     🌘     * 
+`,
+
+`                ✧      .    ✦       *  
+      .      *         ✧     ✦    .         🪐
+   *    ✧      .  ✧    ✨   Maia      *  ✦
+         *     .    .      ✦   ✧   .   .   ✦
+                   ✨       ✦        ✧   ✦
+   *    ✦    .        *       Alcyone  ✧     ✦
+   .     . ✧    🌑  *     🌍   Taygeta  .  ✨   
+        .    .   🌕  .  *    ✧   *    🌠    *    
+          🌎         🪐        .      🌘
+`,
+
+`                .      ✧    🌠        *  
+   *   . ✦        .       ✧     🪐
+      .   Maia   ✧      ✨  .        *
+   ✧        *    🌑     .   *   Taygeta
+  *      🌍        *    .    ✦   *  ✧     ☄️
+         ✧   .  .      .       .   Alcyone   🌒
+      .   *   ✦   .   🪐   ✨ 🌕   .     * . 
+       *   ✧   .    🌑   .     ✧   .    ✨    ✦
+                🌎    .      🌘    * 
+`,
+
+`      *    .  ✦        .    *  ✧      ✨
+           .     ✧  ✨     🌑    .   *     🪐
+  ✦         ✧      .   *      .    . ✧  
+  .        .       Maia        . ✦  🌍  ✦    .  ✨
+  *  ✧   Taygeta 🌠   ✦  🌑      *  Alcyone    . 
+         .      ✨  ✧       *   🌕  .  .  ✧ 
+            🌎         🪐      .      🌘
+`
+];
+
+/* -----------------------------------------
+   LOOP ZA ANIMACIJU ASCII FRAMEOVA
+------------------------------------------*/
+let frame = 0;
+function animate() {
+    document.getElementById("asciiBox").textContent = frames[frame];
+    frame = (frame + 1) % frames.length;
+}
+setInterval(animate, 1900);
+animate();
+</script>
+
+</body>
+</html>
